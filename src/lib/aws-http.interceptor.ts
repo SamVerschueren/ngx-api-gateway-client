@@ -1,4 +1,5 @@
 import * as url from 'url';
+import * as qs from 'querystring';
 import { Injectable, Inject } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
@@ -94,7 +95,8 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 				service: 'execute-api',
 				method: request.method,
 				host: parsedUrl.host,
-				path: parsedUrl.path,
+				path: parsedUrl.pathname,
+				query: qs.parse(parsedUrl.query),
 				headers
 			};
 
