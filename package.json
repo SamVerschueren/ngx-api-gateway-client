@@ -1,0 +1,60 @@
+{
+  "name": "ngx-api-gateway-client",
+  "version": "0.0.0",
+  "description": "AWS API Gateway Client for Angular",
+  "license": "MIT",
+  "repository": "SamVerschueren/ngx-api-gateway-client",
+  "author": {
+    "name": "Sam Verschueren",
+    "email": "sam.verschueren@gmail.com"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": ">=4"
+  },
+  "scripts": {
+    "test": "npm run lint && npm run build",
+    "build": "npm run clean && ngc -p tsconfig.json",
+    "lint": "tslint src/**/*.ts",
+    "clean": "del-cli lib '*.d.ts' '*.js' '*.metadata.json'",
+    "prepublish": "npm run build",
+    "tsc": "tsc"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "index.metadata.json",
+    "lib"
+  ],
+  "keywords": [
+    "angular",
+    "aws",
+    "api",
+    "gateway",
+    "client",
+    "cognito"
+  ],
+  "peerDependencies": {
+    "@angular/common": "^4.3.3",
+    "@angular/core": "^4.3.3",
+    "aws-sdk": "^2.94.0",
+    "rxjs": "^5.4.2"
+  },
+  "devDependencies": {
+    "@angular/common": "^4.3.3",
+    "@angular/compiler": "^4.3.3",
+    "@angular/compiler-cli": "^4.3.3",
+    "@angular/core": "^4.3.3",
+    "@types/node": "^8.0.19",
+    "aws-sdk": "^2.94.0",
+    "codelyzer": "^3.1.2",
+    "del-cli": "^1.1.0",
+    "rxjs": "^5.4.2",
+    "tslint": "^5.5.0",
+    "typescript": "^2.4.2"
+  },
+  "dependencies": {
+    "aws-v4-sign-small": "^1.1.1"
+  },
+  "module": "index.js"
+}
