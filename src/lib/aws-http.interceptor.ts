@@ -90,7 +90,7 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 		if (AWS.config.credentials && !this.refreshing) {
 			const parsedUrl = url.parse(requestUrl);
 
-			const opts = {
+			const opts: any = {
 				region: this.config.region,
 				service: 'execute-api',
 				method: request.method,
@@ -99,6 +99,10 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 				query: qs.parse(parsedUrl.query),
 				headers
 			};
+
+			if (request.body) {
+				opts.body = JSON.stringify(request.body);
+			}
 
 			// Sign the request
 			aws4.sign(opts, AWS.config.credentials);
