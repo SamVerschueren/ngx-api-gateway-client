@@ -99,6 +99,13 @@ export class AWSHttpService {
 		});
 	}
 
+	clearCredentials() {
+		window.localStorage.removeItem(IDENTITY_PARAMS);
+		window.localStorage.removeItem(IDENTITY_DATA);
+
+		AWS.config.credentials = undefined;
+	}
+
 	private restoreCredentials(params: any, data: any) {
 		// Pause all requests while restoring the credentials
 		this.paused$.next(true);
