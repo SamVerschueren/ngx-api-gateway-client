@@ -21,7 +21,7 @@ export class AWSHttpService {
 	onRefreshHandler: (event: HttpEvent<any>) => CognitoCredentials = () => undefined;
 
 	constructor(
-		@Inject(AWS_HTTP_CONFIG) config: Config
+		@Inject(AWS_HTTP_CONFIG) private config: Config
 	) {
 		AWS.config.update({
 			region: config.region
@@ -46,6 +46,14 @@ export class AWSHttpService {
 				this.restoreCredentials(params, data);
 			}
 		}
+	}
+
+	setBaseUrl(baseUrl: string) {
+		this.config.baseUrl = baseUrl;
+	}
+
+	setApiKey(apiKey: string) {
+		this.config.apiKey = apiKey;
 	}
 
 	refresh(cb: () => HttpRequest<any>) {
