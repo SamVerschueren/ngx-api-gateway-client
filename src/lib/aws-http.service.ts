@@ -1,6 +1,6 @@
 
 import { Injectable, Inject } from '@angular/core';
-import { HttpRequest, HttpEvent } from '@angular/common/http';
+import { HttpRequest } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import * as AWS from 'aws-sdk';
@@ -18,7 +18,7 @@ export class AWSHttpService {
 
 	paused$ = new BehaviorSubject(false);
 	refreshRequest: () => HttpRequest<Object> = () => undefined;
-	onRefreshHandler: (event: HttpEvent<any>) => CognitoCredentials = () => undefined;
+	onRefreshHandler: (body: any) => CognitoCredentials = () => undefined;
 
 	constructor(
 		@Inject(AWS_HTTP_CONFIG) private config: Config
@@ -60,7 +60,7 @@ export class AWSHttpService {
 		this.refreshRequest = cb;
 	}
 
-	onRefresh(cb: (event: HttpEvent<any>) => CognitoCredentials) {
+	onRefresh(cb: (body: any) => CognitoCredentials) {
 		this.onRefreshHandler = cb;
 	}
 
