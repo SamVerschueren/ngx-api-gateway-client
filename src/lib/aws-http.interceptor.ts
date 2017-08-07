@@ -22,13 +22,14 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 	constructor(
 		@Inject(AWS_HTTP_CONFIG) private config: Config,
 		private awsHttpService: AWSHttpService
-	) {
-		if (this.config.baseUrl && this.config.baseUrl.endsWith('/')) {
-			this.config.baseUrl = this.config.baseUrl.slice(0, this.config.baseUrl.length - 1);
-		}
-	}
+	) { }
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+		if (!this.isApiGatewayUrl(request.url)) {
+			// Only handle API Gateway URLs
+			return next.handle(request);
+		}
+
 		if (AWS.config.credentials && isExpired((AWS.config.credentials as any).expireTime) && !this.refreshing) {
 			const refreshRequest = this.awsHttpService.refreshRequest();
 
@@ -76,19 +77,8 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 			headers['x-api-key'] = this.config.apiKey;
 		}
 
-		let requestUrl = request.url;
-
-		if (this.config.baseUrl) {
-			if (!requestUrl.startsWith('/')) {
-				// Remove leading slash
-				requestUrl = '/' + requestUrl;
-			}
-
-			requestUrl = this.config.baseUrl + requestUrl;
-		}
-
 		if (AWS.config.credentials && !this.refreshing) {
-			const parsedUrl = url.parse(requestUrl);
+			const parsedUrl = url.parse(request.url);
 
 			const opts: any = {
 				region: this.config.region,
@@ -117,10 +107,13 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 		httpHeaders = httpHeaders.delete('host');
 
 		request = request.clone({
-			url: requestUrl,
 			headers: httpHeaders
 		});
 
 		return next.handle(request);
+	}
+
+	private isApiGatewayUrl(requestUrl: string) {
+		return /^https:\/\/(?:.*?)\.execute-api\.(?:.*?)\.amazonaws.com/.test(requestUrl);
 	}
 }

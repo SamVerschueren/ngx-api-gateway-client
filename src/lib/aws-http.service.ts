@@ -51,8 +51,8 @@ export class AWSHttpService {
 		this.config.baseUrl = baseUrl;
 	}
 
-	setApiKey(apiKey: string) {
-		this.config.apiKey = apiKey;
+	getBaseUrl() {
+		return this.config.baseUrl;
 	}
 
 	refresh(cb: () => HttpRequest<any>) {

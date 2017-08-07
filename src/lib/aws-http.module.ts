@@ -1,6 +1,7 @@
 import { NgModule, ModuleWithProviders } from '@angular/core';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
+import { AWSHttpClient } from './aws-http.client';
 import { AWSHttpService } from './aws-http.service';
 import { AWSHttpInterceptor } from './aws-http.interceptor';
 import { AWS_HTTP_CONFIG } from './aws-http.token';
@@ -16,6 +17,7 @@ export class AWSHttpModule {
 		return {
 			ngModule: AWSHttpModule,
 			providers: [
+				AWSHttpClient,
 				AWSHttpService,
 				{
 					provide: HTTP_INTERCEPTORS,

@@ -56,8 +56,7 @@ The way this module works is by configuring an HTTP interceptor which handles ev
 
 ```ts
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { AWSHttpService } from 'ngx-api-gateway-client';
+import { AWSHttpService, AWSHttpClient } from 'ngx-api-gateway-client';
 
 @Component({
 	selector: 'app-root',
@@ -67,7 +66,7 @@ import { AWSHttpService } from 'ngx-api-gateway-client';
 export class AppComponent {
 
 	constructor(
-		private http: HttpClient,
+		private http: AWSHttpClient,
 		private awsHttpService: AWSHttpService
 	) { }
 
