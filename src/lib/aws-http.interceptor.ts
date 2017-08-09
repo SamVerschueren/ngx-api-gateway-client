@@ -31,7 +31,7 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 		}
 
 		if (AWS.config.credentials && isExpired((AWS.config.credentials as any).expireTime) && !this.refreshing) {
-			const refreshRequest = this.awsHttpService.refreshRequest();
+			let refreshRequest = this.awsHttpService.refreshRequest();
 
 			// Only refresh if a refresh request is defined
 			if (refreshRequest) {
@@ -40,6 +40,11 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 
 				// Pause all incoming requests!
 				this.awsHttpService.paused$.next(true);
+
+				// Prepend the URL with the baseURL
+				refreshRequest = refreshRequest.clone({
+					url: this.awsHttpService.makeUrl(refreshRequest.url)
+				});
 
 				// Invoke the refresh request
 				return this.invoke(refreshRequest, next)

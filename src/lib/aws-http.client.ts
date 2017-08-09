@@ -26,33 +26,15 @@ export class AWSHttpClient extends HttpClient {
 		super(handler);
 	}
 
-	request(first: any, url?: string, options: RequestOptions = {}): Observable<any> {
-		const baseUrl = this.awsHttpService.getBaseUrl();
-
-		if (baseUrl) {
-			if (first instanceof HttpRequest) {
-				first = first.clone({
-					url: this.makeUrl(baseUrl, first.url)
-				});
-			} else {
-				url = this.makeUrl(baseUrl, url);
-			}
+	request(first: string | HttpRequest<any>, url?: string, options: RequestOptions = {}): Observable<any> {
+		if (first instanceof HttpRequest) {
+			first = first.clone({
+				url: this.awsHttpService.makeUrl(first.url)
+			});
+		} else {
+			url = this.awsHttpService.makeUrl(url);
 		}
 
-		return super.request(first, url, options);
-	}
-
-	private makeUrl(baseUrl: string, path: string) {
-		if (baseUrl.endsWith('/')) {
-			// Remove trailing slash to the base url
-			baseUrl = baseUrl.slice(0, baseUrl.length - 1);
-		}
-
-		if (!path.startsWith('/')) {
-			// Append leading slash to the path
-			path = '/' + path;
-		}
-
-		return baseUrl + path;
+		return super.request(first as any, url, options);
 	}
 }

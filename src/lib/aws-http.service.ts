@@ -102,6 +102,27 @@ export class AWSHttpService {
 		AWS.config.credentials = undefined;
 	}
 
+	makeUrl(path: string) {
+		let baseUrl = this.config.baseUrl;
+
+		if (!baseUrl || path.startsWith('http')) {
+			// Return the path if we don't have a base url or if the path starts with http
+			return path;
+		}
+
+		if (baseUrl.endsWith('/')) {
+			// Remove trailing slash to the base url
+			baseUrl = baseUrl.slice(0, baseUrl.length - 1);
+		}
+
+		if (!path.startsWith('/')) {
+			// Append leading slash to the path
+			path = '/' + path;
+		}
+
+		return baseUrl + path;
+	}
+
 	private loadCredentials(params: any, data: any) {
 		return new Promise((resolve, reject) => {
 			const cognitoCredentials = new AWS.CognitoIdentityCredentials(params);
