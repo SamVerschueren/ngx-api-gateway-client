@@ -1,6 +1,6 @@
 {
   "name": "ngx-api-gateway-client",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "AWS API Gateway Client for Angular",
   "license": "MIT",
   "repository": "SamVerschueren/ngx-api-gateway-client",
