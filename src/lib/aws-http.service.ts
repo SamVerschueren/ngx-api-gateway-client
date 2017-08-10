@@ -1,8 +1,9 @@
 
 import { Injectable, Inject } from '@angular/core';
-import { HttpRequest } from '@angular/common/http';
+import { HttpRequest, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subject } from 'rxjs/Subject';
 import * as AWS from 'aws-sdk';
 
 import { AWS_HTTP_CONFIG } from './aws-http.token';
@@ -16,6 +17,7 @@ const IDENTITY_DATA = 'cognito-identity.data';
 @Injectable()
 export class AWSHttpService {
 
+	error$ = new Subject<HttpErrorResponse>();
 	paused$ = new BehaviorSubject(false);
 	refreshRequest: () => HttpRequest<Object> = () => undefined;
 	onRefreshHandler: (body: any) => CognitoCredentials = () => undefined;

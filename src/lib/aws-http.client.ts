@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpRequest, HttpHandler, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
 
 import { AWSHttpService } from './aws-http.service';
 
@@ -35,6 +36,11 @@ export class AWSHttpClient extends HttpClient {
 			url = this.awsHttpService.makeUrl(url);
 		}
 
-		return super.request(first as any, url, options);
+		return super.request(first as any, url, options)
+			.catch((err, caught) => {
+				this.awsHttpService.error$.next(err);
+
+				return caught;
+			});
 	}
 }
