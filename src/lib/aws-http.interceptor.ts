@@ -3,9 +3,11 @@ import * as qs from 'querystring';
 import { Injectable, Inject } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/finally';
 import * as aws4 from 'aws-v4-sign-small';
 import * as AWS from 'aws-sdk';
 
@@ -56,10 +58,20 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 						return this.awsHttpService.setCognitoCredentials(credentials);
 					})
 					.switchMap(() => {
-						this.refreshing = false;
+						// Unpause in-flight requests
 						this.awsHttpService.paused$.next(false);
 
 						return this.invoke(request, next);
+					})
+					.finally(() => {
+						// Always mark `refreshing` as `false`
+						this.refreshing = false;
+					})
+					.catch(err => {
+						// Create a new paused$ subject
+						this.awsHttpService.paused$ = new BehaviorSubject(false);
+
+						return Observable.throw(err);
 					});
 			}
 		}
