@@ -58,16 +58,18 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 						return this.awsHttpService.setCognitoCredentials(credentials);
 					})
 					.switchMap(() => {
+						// Mark `refreshing` as `false` before executing other requests
+						this.refreshing = false;
+
 						// Unpause in-flight requests
 						this.awsHttpService.paused$.next(false);
 
 						return this.invoke(request, next);
 					})
-					.finally(() => {
-						// Always mark `refreshing` as `false`
-						this.refreshing = false;
-					})
 					.catch(err => {
+						// Mark `refreshing` as `false`
+						this.refreshing = false;
+
 						// Create a new paused$ subject
 						this.awsHttpService.paused$ = new BehaviorSubject(false);
 
