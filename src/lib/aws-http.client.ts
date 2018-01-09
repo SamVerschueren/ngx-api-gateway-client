@@ -10,9 +10,13 @@ export declare type HttpObserve = 'body' | 'events' | 'response';
 
 export interface RequestOptions {
 	body?: any;
-	headers?: HttpHeaders;
+	headers?: HttpHeaders | {
+		[header: string]: string | string[];
+	};
 	observe?: HttpObserve;
-	params?: HttpParams;
+	params?: HttpParams | {
+		[param: string]: string | string[];
+	};
 	reportProgress?: boolean;
 	responseType?: 'arraybuffer' | 'blob' | 'json' | 'text';
 	withCredentials?: boolean;
