@@ -73,6 +73,9 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 						// Create a new paused$ subject
 						this.awsHttpService.paused$ = new BehaviorSubject(false);
 
+						// Call onRefreshErrorHandler to let the user handle the error when the refresh fails
+						this.awsHttpService.onRefreshErrorHandler(err);
+
 						return Observable.throw(err);
 					});
 			}

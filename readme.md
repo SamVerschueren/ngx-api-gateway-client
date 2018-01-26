@@ -100,9 +100,12 @@ The `AWSHttpService.refresh` method accepts a function which returns a `HttpRequ
 
 Because the library is not aware of what the response of the refresh request looks like, a second function has to be provided in the `AWSHttpService.onRefresh` call. This function accepts the response of the refresh API call and should return an object which determines the new cognito credentials.
 
+It can happen that the request which is made to refresh the tokens fails. In order to handle this error, an extra method `AWSHttpService.onRefreshError` can be used. This function will return the error of the request.
+
 ```ts
 import { Component, OnInit } from '@angular/core';
 import { HttpRequest } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { AWSHttpService, AWSHttpClient } from 'ngx-api-gateway-client';
 
 @Component({
@@ -114,7 +117,8 @@ export class AppComponent implements OnInit {
 
 	constructor(
 		private http: AWSHttpClient,
-		private awsHttpService: AWSHttpService
+		private awsHttpService: AWSHttpService,
+		private router: Router
 	) { }
 
 	onSubmit() {
@@ -125,32 +129,41 @@ export class AppComponent implements OnInit {
 		// Provide a function that returns the HTTP request that should be made in order to refresh the token
 		this.awsHttpService.refresh(() => {
 			// Retrieve the response from our authentication request
-            let data: any = window.localStorage.getItem('data');
+			let data: any = window.localStorage.getItem('data');
 
-            if (data) {
-                data = JSON.parse(data);
+			if (data) {
+				data = JSON.parse(data);
 
 				// Return the request that should be made in order to refresh the token
-                return new HttpRequest('POST', '/refreshtoken', {
-                    token: data.RefreshToken,
-                    identity: data.IdentityId
-                });
-            }
+				return new HttpRequest('POST', '/refreshtoken', {
+					token: data.RefreshToken,
+					identity: data.IdentityId
+				});
+			}
 
-            return undefined;
-        });
+			return undefined;
+		});
 
 		// Provide a function that receives the `/refreshtoken` HTTP response and returns the new token and identity id
 		this.awsHttpService.onRefresh((result: any) => {
 			// Update the login result
-            window.localStorage.setItem('data', JSON.stringify(data));
+			window.localStorage.setItem('data', JSON.stringify(data));
 
 			// Return an object with the new `Token` and `IdentityId`
-            return {
-                Token: result.Token,
-                IdentityId: result.IdentityId
-            };
-        });
+			return {
+				Token: result.Token,
+				IdentityId: result.IdentityId
+			};
+		});
+
+		// This method will be executed when the refresh request fails.
+		this.awsHttpService.onRefreshError((error: any) => {
+			// Refresh request has failed
+
+			// Inform the user
+			// ex. redirect user to the login page
+			this.router.navigate([`/login`]);
+		});
 	}
 }
 ```

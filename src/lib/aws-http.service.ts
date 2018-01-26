@@ -21,6 +21,7 @@ export class AWSHttpService {
 	paused$ = new BehaviorSubject(false);
 	refreshRequest: () => HttpRequest<Object> = () => undefined;
 	onRefreshHandler: (body: any) => CognitoCredentials = () => undefined;
+	onRefreshErrorHandler: (body: any) => void = () => undefined;
 
 	constructor(
 		@Inject(AWS_HTTP_CONFIG) private config: Config
@@ -63,6 +64,10 @@ export class AWSHttpService {
 
 	onRefresh(cb: (body: any) => CognitoCredentials) {
 		this.onRefreshHandler = cb;
+	}
+
+	onRefreshError(cb: (body: any) => void) {
+		this.onRefreshErrorHandler = cb;
 	}
 
 	setCognitoCredentials(credentials: CognitoCredentials) {
