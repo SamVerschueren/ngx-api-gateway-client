@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subject } from 'rxjs/Subject';
 import * as AWS from 'aws-sdk';
 
-import { AWS_HTTP_CONFIG } from './aws-http.token';
+import { AWS_HTTP_CONFIG, STORAGE } from './tokens';
 import { isExpired } from './utils';
 import { Config } from './entities/config';
 import { CognitoCredentials } from './entities/cognito-credentials';
@@ -24,14 +24,15 @@ export class AWSHttpService {
 	onRefreshErrorHandler: (body: any) => void = () => undefined;
 
 	constructor(
-		@Inject(AWS_HTTP_CONFIG) private config: Config
+		@Inject(AWS_HTTP_CONFIG) private config: Config,
+		@Inject(STORAGE) private storage: any
 	) {
 		AWS.config.update({
 			region: config.region
 		});
 
-		const params = JSON.parse(window.localStorage.getItem(IDENTITY_PARAMS));
-		const data = JSON.parse(window.localStorage.getItem(IDENTITY_DATA));
+		const params = JSON.parse(this.storage.getItem(IDENTITY_PARAMS));
+		const data = JSON.parse(this.storage.getItem(IDENTITY_DATA));
 
 		if (params && data) {
 			// Restore previous credentials
@@ -103,8 +104,8 @@ export class AWSHttpService {
 	}
 
 	clearCredentials() {
-		window.localStorage.removeItem(IDENTITY_PARAMS);
-		window.localStorage.removeItem(IDENTITY_DATA);
+		this.storage.removeItem(IDENTITY_PARAMS);
+		this.storage.removeItem(IDENTITY_DATA);
 
 		AWS.config.credentials = undefined;
 	}
@@ -140,8 +141,8 @@ export class AWSHttpService {
 					return reject(err);
 				}
 
-				window.localStorage.setItem(IDENTITY_PARAMS, JSON.stringify(params));
-				window.localStorage.setItem(IDENTITY_DATA, JSON.stringify(data));
+				this.storage.setItem(IDENTITY_PARAMS, JSON.stringify(params));
+				this.storage.setItem(IDENTITY_DATA, JSON.stringify(data));
 
 				AWS.config.credentials = cognitoCredentials;
 

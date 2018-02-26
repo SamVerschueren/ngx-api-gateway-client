@@ -10,7 +10,7 @@ import * as aws4 from 'aws-v4-sign-small';
 import * as AWS from 'aws-sdk';
 
 import { AWSHttpService } from './aws-http.service';
-import { AWS_HTTP_CONFIG } from './aws-http.token';
+import { AWS_HTTP_CONFIG } from './tokens';
 import { Config } from './entities/config';
 import { isExpired } from './utils';
 

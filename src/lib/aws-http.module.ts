@@ -4,7 +4,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AWSHttpClient } from './aws-http.client';
 import { AWSHttpService } from './aws-http.service';
 import { AWSHttpInterceptor } from './aws-http.interceptor';
-import { AWS_HTTP_CONFIG } from './aws-http.token';
+import { AWS_HTTP_CONFIG, STORAGE } from './tokens';
 import { Config } from './entities/config';
 
 @NgModule({
@@ -24,7 +24,8 @@ export class AWSHttpModule {
 					useClass: AWSHttpInterceptor,
 					multi: true
 				},
-				{ provide: AWS_HTTP_CONFIG, useFactory: factory }
+				{ provide: AWS_HTTP_CONFIG, useFactory: factory },
+				{ provide: STORAGE, useValue: localStorage }
 			]
 		};
 	}
