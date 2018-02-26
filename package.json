@@ -16,15 +16,8 @@
     "test": "npm run lint && npm run build",
     "build": "ng-packagr -p package.json",
     "lint": "tslint src/**/*.ts",
-    "prepublish": "npm run build && cd dist",
     "tsc": "tsc"
   },
-  "files": [
-    "index.js",
-    "index.d.ts",
-    "index.metadata.json",
-    "lib"
-  ],
   "keywords": [
     "angular",
     "aws",
