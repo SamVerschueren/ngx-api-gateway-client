@@ -4,10 +4,8 @@ import { Injectable, Inject } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/finally';
+import { _throw } from 'rxjs/observable/throw';
+import { filter, switchMap, catchError, first } from 'rxjs/operators';
 import * as aws4 from 'aws-v4-sign-small';
 import * as AWS from 'aws-sdk';
 
@@ -50,42 +48,46 @@ export class AWSHttpInterceptor implements HttpInterceptor {
 
 				// Invoke the refresh request
 				return this.invoke(refreshRequest, next)
-					// Only listen for `HttpResponse` results, not all the intermediate events
-					.filter(event => event instanceof HttpResponse)
-					.switchMap((result: HttpResponse<any>) => {
-						const credentials = this.awsHttpService.onRefreshHandler(result.body);
+					.pipe(
+						// Only listen for `HttpResponse` results, not all the intermediate events
+						filter(event => event instanceof HttpResponse),
+						switchMap((result: HttpResponse<any>) => {
+							const credentials = this.awsHttpService.onRefreshHandler(result.body);
 
-						return this.awsHttpService.setCognitoCredentials(credentials);
-					})
-					.switchMap(() => {
-						// Mark `refreshing` as `false` before executing other requests
-						this.refreshing = false;
+							return this.awsHttpService.setCognitoCredentials(credentials);
+						}),
+						switchMap(() => {
+							// Mark `refreshing` as `false` before executing other requests
+							this.refreshing = false;
 
-						// Unpause in-flight requests
-						this.awsHttpService.paused$.next(false);
+							// Unpause in-flight requests
+							this.awsHttpService.paused$.next(false);
 
-						return this.invoke(request, next);
-					})
-					.catch(err => {
-						// Mark `refreshing` as `false`
-						this.refreshing = false;
+							return this.invoke(request, next);
+						}),
+						catchError(err => {
+							// Mark `refreshing` as `false`
+							this.refreshing = false;
 
-						// Create a new paused$ subject
-						this.awsHttpService.paused$ = new BehaviorSubject(false);
+							// Create a new paused$ subject
+							this.awsHttpService.paused$ = new BehaviorSubject(false);
 
-						// Call onRefreshErrorHandler to let the user handle the error when the refresh fails
-						this.awsHttpService.onRefreshErrorHandler(err);
+							// Call onRefreshErrorHandler to let the user handle the error when the refresh fails
+							this.awsHttpService.onRefreshErrorHandler(err);
 
-						return Observable.throw(err);
-					});
+							return _throw(err);
+						})
+					);
 			}
 		}
 
 		// Requests are paused when credentials are being generated or refreshed
 		return this.awsHttpService.paused$
-			.filter(isPaused => !isPaused)
-			.first()
-			.switchMap(() => this.invoke(request, next));
+			.pipe(
+				filter(isPaused => !isPaused),
+				first(),
+				switchMap(() => this.invoke(request, next))
+			);
 	}
 
 	private invoke(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
