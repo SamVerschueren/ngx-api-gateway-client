@@ -14,10 +14,9 @@
   },
   "scripts": {
     "test": "npm run lint && npm run build",
-    "build": "npm run clean && ngc -p tsconfig.json",
+    "build": "ng-packagr -p package.json",
     "lint": "tslint src/**/*.ts",
-    "clean": "del-cli lib '*.d.ts' '*.js' '*.metadata.json'",
-    "prepublish": "npm run build",
+    "prepublish": "npm run build && cd dist",
     "tsc": "tsc"
   },
   "files": [
@@ -49,6 +48,7 @@
     "aws-sdk": "^2.178.0",
     "codelyzer": "^4.0.2",
     "del-cli": "^1.1.0",
+    "ng-packagr": "^2.1.0",
     "rxjs": "^5.5.6",
     "tslint": "^5.8.0",
     "typescript": "^2.5.3"
@@ -56,5 +56,10 @@
   "dependencies": {
     "aws-v4-sign-small": "^1.1.1"
   },
-  "module": "index.js"
+  "module": "index.js",
+  "ngPackage": {
+    "lib": {
+      "entryFile": "src/index.ts"
+    }
+  }
 }
